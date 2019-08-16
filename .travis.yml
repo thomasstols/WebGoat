@@ -5,16 +5,11 @@ install: "/bin/true"
 sudo: required
 services:
 - docker
-addons:
-  sonarcloud:
-    organization: "$SONAR_ORGANIZATION"
-    token:
-      secure: "$SONAR_TOKEN"
 script:
 - export BRANCH=$(if [ "$TRAVIS_PULL_REQUEST" == "false" ]; then echo $TRAVIS_BRANCH; else echo $TRAVIS_PULL_REQUEST_BRANCH; fi)
 - echo "TRAVIS_BRANCH=$TRAVIS_BRANCH, PR=$PR, BRANCH=$BRANCH"
 - if [ ! -z "${TRAVIS_TAG}" ]; then mvn versions:set -DnewVersion=${TRAVIS_TAG:1}; fi
-- mvn clean verify sonar:sonar -Pcoverage -Dsonar.projectKey=$SONAR_ORGANIZATION_WebGoat
+- mvn clean install -q
 cache:
   directories:
   - "$HOME/.m2"
