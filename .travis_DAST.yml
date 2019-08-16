@@ -1,7 +1,10 @@
+services:
+  - docker
 language: java
 jdk:
 - openjdk11
-install: "/bin/true"
+install: true
+sudo: false
 addons:
   sonarcloud:
     organization: "thomasstols"
@@ -11,7 +14,7 @@ script:
 - export BRANCH=$(if [ "$TRAVIS_PULL_REQUEST" == "false" ]; then echo $TRAVIS_BRANCH; else echo $TRAVIS_PULL_REQUEST_BRANCH; fi)
 - echo "TRAVIS_BRANCH=$TRAVIS_BRANCH, PR=$PR, BRANCH=$BRANCH"
 - if [ ! -z "${TRAVIS_TAG}" ]; then mvn versions:set -DnewVersion=${TRAVIS_TAG:1}; fi
-- mvn clean verify sonar:sonar -Pcoverage -Dsonar.projectKey=thomasstols_WebGoat
+- mvn clean org.jacoco:jacoco-maven-plugin:prepare-agent package sonar:sonar install -e
 cache:
   directories:
   - "$HOME/.m2"
@@ -25,6 +28,27 @@ before_deploy:
   - cp -fa $WEBWOLF_TARGET_DIR/*.jar $WEBGOAT_ARTIFACTS_FOLDER/
   - echo "Contents of artifacts folder:"
   - ls $WEBGOAT_ARTIFACTS_FOLDER
+deploy:
+  - provider: script
+    skip_cleanup: true
+    script: bash scripts/deploy-webgoat.sh
+    on:
+      repo: thomasstols/WebGoat
+      tags: true
+after_deploy:
+  - docker pull thomasstols/webgoat:latest
+  - docker run -p 8080:8080 thomasstols/webgoat:latest  &
+  - docker ps -a
+  - docker pull owasp/zap2docker-stable
+  - docker run -t owasp/zap2docker-stable zap-baseline.py -t http://172.17.0.2:8080/WebGoat
+  - docker ps -a
+  - docker inspect 
+        $(docker ps |grep thomasstols/webgoat 
+        | awk '{print $1}')
+        | grep IPAddress
+  - docker kill 
+        $(docker ps |grep thomasstols/webgoat 
+        | awk '{print $1}')
 env:
   global:
   #Docker login
