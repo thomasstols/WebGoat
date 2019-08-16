@@ -2,9 +2,6 @@ language: java
 jdk:
 - openjdk11
 install: "/bin/true"
-sudo: required
-services:
-- docker
 addons:
   sonarcloud:
     organization: "$SONAR_ORGANIZATION"
@@ -28,24 +25,3 @@ before_deploy:
   - cp -fa $WEBWOLF_TARGET_DIR/*.jar $WEBGOAT_ARTIFACTS_FOLDER/
   - echo "Contents of artifacts folder:"
   - ls $WEBGOAT_ARTIFACTS_FOLDER
-deploy:
-  - provider: script
-    skip_cleanup: true
-    script: bash scripts/deploy-webgoat.sh
-    on:
-      repo: thomasstols/WebGoat
-      tags: true
-after_deploy:
-  - docker pull $DOCKER_USER/webgoat:latest
-  - docker run -p 8080:8080 $DOCKER_USER/webgoat:latest  &
-  - docker ps -a
-  - docker pull owasp/zap2docker-stable
-  - docker run -t owasp/zap2docker-stable zap-baseline.py -t http://172.17.0.2:8080/WebGoat
-  - docker ps -a
-  - docker inspect 
-        $(docker ps |grep $DOCKER_USER/webgoat 
-        | awk '{print $1}')
-        | grep IPAddress
-  - docker kill 
-        $(docker ps |grep $DOCKER_USER/webgoat 
-        | awk '{print $1}')
