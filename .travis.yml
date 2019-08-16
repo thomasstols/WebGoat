@@ -4,14 +4,20 @@ language: java
 jdk:
 - openjdk11
 install: "/bin/true"
+addons:
+  sonarcloud:
+    organization: "thomasstols"
+    token:
+      secure: "$SONAR_TOKEN"
 script:
 - export BRANCH=$(if [ "$TRAVIS_PULL_REQUEST" == "false" ]; then echo $TRAVIS_BRANCH; else echo $TRAVIS_PULL_REQUEST_BRANCH; fi)
 - echo "TRAVIS_BRANCH=$TRAVIS_BRANCH, PR=$PR, BRANCH=$BRANCH"
 - if [ ! -z "${TRAVIS_TAG}" ]; then mvn versions:set -DnewVersion=${TRAVIS_TAG:1}; fi
-- mvn clean install -q
+- mvn clean org.jacoco:jacoco-maven-plugin:prepare-agent package sonar:sonar install -e
 cache:
   directories:
   - "$HOME/.m2"
+  - "$HOME/.sonar/cache"
 before_deploy:
   - export WEBGOAT_SERVER_TARGET_DIR=$HOME/build/$TRAVIS_REPO_SLUG/webgoat-server/target
   - export WEBWOLF_TARGET_DIR=$HOME/build/$TRAVIS_REPO_SLUG/webwolf/target
