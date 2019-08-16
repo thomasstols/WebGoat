@@ -4,6 +4,7 @@ language: java
 jdk:
 - openjdk11
 install: "/bin/true"
+sudo: false
 addons:
   sonarcloud:
     organization: "thomasstols"
@@ -31,17 +32,6 @@ deploy:
   - provider: script
     skip_cleanup: true
     script: bash scripts/deploy-webgoat.sh
-    on:
-      repo: WebGoat/WebGoat
-      tags: true
-  - provider: releases
-    skip_cleanup: true
-    overwrite: true
-    api_key:
-      #api-key from webgoat-github user
-      secure: pJOLBnl6427PcVg/tVy/qB18JC7b8cKpffau+IP0pjdSt7KUfBdBY3QuJ7mrM65zRoVILzggLckaew2PlRmYQRdumyWlyRn44XiJ9KO4n6Bsufbz+ictB4ggtozpp9+I9IIUh1TmqypL9lhkX2ONM9dSHmyblYpAAgMuYSK8FYc=
-    file_glob: true
-    file: $WEBGOAT_ARTIFACTS_FOLDER/*
     on:
       repo: WebGoat/WebGoat
       tags: true
