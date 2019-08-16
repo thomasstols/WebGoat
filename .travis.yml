@@ -28,13 +28,6 @@ before_deploy:
   - cp -fa $WEBWOLF_TARGET_DIR/*.jar $WEBGOAT_ARTIFACTS_FOLDER/
   - echo "Contents of artifacts folder:"
   - ls $WEBGOAT_ARTIFACTS_FOLDER
-deploy:
-  - provider: script
-    skip_cleanup: true
-    script: bash scripts/deploy-webgoat.sh
-    on:
-      repo: thomasstols/WebGoat
-      tags: true
 env:
   global:
   #Docker login
