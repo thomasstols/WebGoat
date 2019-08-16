@@ -33,7 +33,7 @@ deploy:
     skip_cleanup: true
     script: bash scripts/deploy-webgoat.sh
     on:
-      repo: WebGoat/WebGoat
+      repo: thomasstols/WebGoat
       tags: true
 env:
   global:
