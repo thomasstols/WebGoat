@@ -13,7 +13,6 @@ script:
 cache:
   directories:
   - "$HOME/.m2"
-  - "$HOME/.sonar/cache"
 before_deploy:
   - export WEBGOAT_SERVER_TARGET_DIR=$HOME/build/$TRAVIS_REPO_SLUG/webgoat-server/target
   - export WEBWOLF_TARGET_DIR=$HOME/build/$TRAVIS_REPO_SLUG/webwolf/target
@@ -28,7 +27,7 @@ deploy:
     skip_cleanup: true
     script: bash scripts/deploy-webgoat.sh
     on:
-      repo: thomasstols/WebGoat
+      repo: $DOCKER_USER/WebGoat
       tags: true
 after_deploy:
   - docker pull $DOCKER_USER/webgoat:latest
