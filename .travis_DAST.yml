@@ -1,20 +1,15 @@
-services:
-  - docker
 language: java
 jdk:
 - openjdk11
-install: true
-sudo: false
-addons:
-  sonarcloud:
-    organization: "$SONAR_ORGANIZATION"
-    token:
-      secure: "$SONAR_TOKEN"
+install: "/bin/true"
+sudo: required
+services:
+- docker
 script:
 - export BRANCH=$(if [ "$TRAVIS_PULL_REQUEST" == "false" ]; then echo $TRAVIS_BRANCH; else echo $TRAVIS_PULL_REQUEST_BRANCH; fi)
 - echo "TRAVIS_BRANCH=$TRAVIS_BRANCH, PR=$PR, BRANCH=$BRANCH"
 - if [ ! -z "${TRAVIS_TAG}" ]; then mvn versions:set -DnewVersion=${TRAVIS_TAG:1}; fi
-- mvn clean verify sonar:sonar -Pcoverage -Dsonar.projectKey=$SONAR_ORGANIZATION_WebGoat
+- mvn clean install -q
 cache:
   directories:
   - "$HOME/.m2"
@@ -36,22 +31,16 @@ deploy:
       repo: thomasstols/WebGoat
       tags: true
 after_deploy:
-  - docker pull thomasstols/webgoat:latest
-  - docker run -p 8080:8080 thomasstols/webgoat:latest  &
+  - docker pull $DOCKER_USER/webgoat:latest
+  - docker run -p 8080:8080 $DOCKER_USER/webgoat:latest  &
   - docker ps -a
   - docker pull owasp/zap2docker-stable
   - docker run -t owasp/zap2docker-stable zap-baseline.py -t http://172.17.0.2:8080/WebGoat
   - docker ps -a
   - docker inspect 
-        $(docker ps |grep thomasstols/webgoat 
+        $(docker ps |grep $DOCKER_USER/webgoat 
         | awk '{print $1}')
         | grep IPAddress
   - docker kill 
-        $(docker ps |grep thomasstols/webgoat 
+        $(docker ps |grep $DOCKER_USER/webgoat 
         | awk '{print $1}')
-env:
-  global:
-  #Docker login
-  - secure: XgPc0UKRTUI70I4YWNQpThPPWeQIxkmzh1GNoR/SSDC2GPIBq3EfkkbSQewqil8stTy+S1/xSzc0JXG8NTn7UOxHVHA/2nhI6jX9E+DKtXQ89YwmaDNQjkbMjziAtDCIex+5TRykxNfkxj6VPYbDssrzI7iJXOIZVj/HoyO3O5E=
-  #Docker password
-  - secure: aly5TKBUK9sIiqtMbytNNPZHQhC0a7Yond5tEtuJ8fO+j/KZB4Uro3I6BhzYjGWFb5Kndd0j2TXHPFvtOl402J1CmFsY3v0BhilQd0g6zOssp5T0A73m8Jgq4ItV8wQJJy2bQsXqL1B+uFYieYPiMchj7JxWW0vBn7TV5b68l6U=
