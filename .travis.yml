@@ -8,7 +8,6 @@ script:
 - if [ ! -z "${TRAVIS_TAG}" ]; then mvn versions:set -DnewVersion=${TRAVIS_TAG:1}; fi
 - mvn clean install -q
 - npm install -g snyk
-- snyk auth $SNYK_TOKEN
 - snyk test || true
 cache:
   directories:
