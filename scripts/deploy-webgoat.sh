@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 docker login -u $DOCKER_USER -p $DOCKER_PASS
-export REPO=webgoat/webgoat-8.0
+export REPO=thomasstols/webgoat
 
 cd webgoat-server
 ls target/
@@ -22,7 +22,7 @@ else
 fi
 
 
-export REPO=webgoat/webwolf
+export REPO=thomasstols/webwolf
 cd ..
 cd webwolf
 ls target/
