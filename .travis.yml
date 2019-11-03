@@ -21,7 +21,5 @@ before_deploy:
   - export WEBWOLF_TARGET_DIR=$HOME/build/$TRAVIS_REPO_SLUG/webwolf/target
   - export WEBGOAT_ARTIFACTS_FOLDER=$HOME/build/$TRAVIS_REPO_SLUG/Deployable_Artifacts/
   - mkdir -p $WEBGOAT_ARTIFACTS_FOLDER
-  - cp -fa $WEBGOAT_SERVER_TARGET_DIR/*.jar $WEBGOAT_ARTIFACTS_FOLDER/
-  - cp -fa $WEBWOLF_TARGET_DIR/*.jar $WEBGOAT_ARTIFACTS_FOLDER/
-  - echo "Contents of artifacts folder:"
-  - ls $WEBGOAT_ARTIFACTS_FOLDER
+  - cp -fa $WEBGOAT_SERVER_TARGET_DIR/*.jar $WEBGOAT_ARTIFACTS_FOLDER/ > /dev/null
+  - cp -fa $WEBWOLF_TARGET_DIR/*.jar $WEBGOAT_ARTIFACTS_FOLDER/ > /dev/null
